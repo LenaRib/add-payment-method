@@ -2,6 +2,7 @@
   "baseUrl": "https://stage.my.osome.club/",
   "env": {
     "phone": "+93-12-351-235",
-    "code": "1235"
+    "code": "1235",
+    "card_number": "4000 0027 6000 3184"
   }
 }

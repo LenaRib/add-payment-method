@@ -1,4 +1,4 @@
-//<reference types="cypress" />
+/// <reference types="cypress" />
 
 Cypress.Commands.add('getBySel', (selector, ...args) => {
   //should work return cy.get(`[data-test*=${selector}]`, ...args)
@@ -29,31 +29,104 @@ describe('osome', () => {
       .click()
   })
 
-  it('navigate to payment method', () => {
+  it('navigate to side block info-panel', () => {
     cy.get('[data-test="SettingsButton"]')
       .should('be.visible')
       .click()
 
     cy.get('[data-test="header-link-billing"]')
       .click()
+      .wait(5000)
 
     cy.getBySel('info-panel')
-      .wait(800)
       .should('be.visible')
-      .click()
-
-    cy.getBySel('payment-method::change-payment-method')
-    //check current method
-    //close open equal 
-
+      .click({ multiple: true })
   })
 
-  it('check availability of invoice and card', () => {
-    //check post request with choosen methods
+  const ButtonTextForSaveChanges = 'Change'
+
+  const closeEditPaymentWindow = () => {
+    cy.get('body').then($body => {
+      if ($body.find('[data-testid="modal"]').length === 1) {
+        cy.get('[data-testid="closeModal"]')
+          .click()
+          .wait(4000)
+      }
+    })
+  }
+
+  const openEditPaymentWindow = () => {
+    cy.getBySel('payment-method\\:\\:change-payment-method')
+    .click()
+  }
+
+  it('change payment method to Card', () => {
+
+    openEditPaymentWindow()
+
+    cy.getBySel('RadioActive-card')
+      .check({force: true})
+
+    cy.getBySel('card-item')
+      .first()
+      .click()
+
+    cy.intercept('POST','/api/v2/payment').as('paymentMethodCheck')
+    
+    cy.get('button')
+      .contains(ButtonTextForSaveChanges)
+      .click()
+      .wait(5000)
+
+    cy.wait('@paymentMethodCheck', {timeout: 30000}).its('response.statusCode').should('eq', 200)
+
+    openEditPaymentWindow()
+
+    cy.getBySel('RadioActive-card')
+      .should('be.checked')
+
+    closeEditPaymentWindow()
+  })
+
+  it('change payment method to Invoice', () => {
+    //what payment method should be by default?
+
+    openEditPaymentWindow()
+
+    cy.getBySel('RadioActive-invoice')
+      .check({force: true})
+
+    cy.get('button').contains(ButtonTextForSaveChanges)
+      .click()
+      .wait(5000)
+
+    openEditPaymentWindow()
+
+    cy.getBySel('RadioActive-invoice')
+      .should('be.checked')
+
+    closeEditPaymentWindow()
+  })
+
+
+  it('add new card', () => {
+    const cardNumber = Cypress.env('card_number')
+    openEditPaymentWindow()
+
+    cy.getBySel('RadioActive-card')
+      .check({force: true})
+    cy.get('button').contains('add new card').click().wait(9000)
+    cy.get('[name="cardnumber"]')
+      .then(el => el.val(cardNumber))
+      .type('{enter}')
+      .wait(10000)
+    cy.get('button')
+      .first()
+      .click()
   })
 
   it('add new card', () => {
-    //data, negative positive, 
+    //data, negative, positive, 
     //on click save check request
   })
 })
