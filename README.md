@@ -21,3 +21,16 @@ Steps to be executed:
 9. click on the 'change' button, check that request with 'POST','/api/v2/payment' was sended, response 200 
 10. add a new card with right and wrong details
 11. click save check request
+
+
+or
+
+Check list:
+
+When you change the payment method, the selected method is saved
+1.1. From Credit or debit card to Bank transfer
+1.2. C Bank transfer to Credit or debit card
+When you change the payment method, it changes for all active products
+When adding a new card, it is saved and appears in the list of cards
+When adding a new card, old cards are not deleted.
+When you select a card, it becomes the default payment card
